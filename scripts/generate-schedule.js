@@ -40,7 +40,7 @@ function toDateString(date) {
 }
 
 function buildDateTime(date, time) {
-    return `${toDateString(date)}T${time}:00`;
+    return `${toDateString(date)}T${time}:00-06:00`;
 }
 
 function getTitle(page, propertyName) {
@@ -262,12 +262,18 @@ async function createInstanceFromTemplate(template, weekStart) {
         };
     }
 
-    await notion.pages.create({
+    const pagePayload = {
         parent: {
             database_id: databaseId,
         },
         properties,
-    });
+    };
+
+    if (template.icon) {
+        pagePayload.icon = template.icon;
+    }
+
+    await notion.pages.create(pagePayload);
 
     console.log(`Created: ${instanceKey}`);
 }
