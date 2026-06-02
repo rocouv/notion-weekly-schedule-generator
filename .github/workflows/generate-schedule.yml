@@ -1,0 +1,38 @@
+name: Generate Weekly Schedule
+
+on:
+  workflow_dispatch:
+    inputs:
+      week_start:
+        description: "Monday date for the week. Format: YYYY-MM-DD"
+        required: true
+        default: "2026-06-01"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate schedule
+        run: pnpm generate
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_SCHEDULE_DATABASE_ID: ${{ secrets.NOTION_SCHEDULE_DATABASE_ID }}
+          WEEK_START: ${{ github.event.inputs.week_start }}
